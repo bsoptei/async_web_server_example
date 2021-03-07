@@ -7,9 +7,12 @@ use std::collections::HashMap;
 
 pub mod handlers;
 mod impls;
+mod tests;
 
-type Key = usize;
-type Item = HashMap<String, Value>;
+use handlers::*;
+
+pub type Key = usize;
+pub type Item = HashMap<String, Value>;
 
 pub trait StoreProviderFeatures {
     type Store;
@@ -26,4 +29,13 @@ pub trait DataStore {
     async fn get_all(&self) -> String;
     async fn replace(&self, key: Key, item: Item) -> Option<Key>;
     async fn update(&self, key: Key, item: Item) -> Option<Key>;
+}
+
+pub fn configure_endpoints<Store: 'static + DataStore>(cfg: &mut web::ServiceConfig) {
+    cfg.route("/data", web::post().to(create::<Store>))
+        .route("/data/{key}", web::delete().to(delete::<Store>))
+        .route("/data/{key}", web::get().to(read::<Store>))
+        .route("/data", web::get().to(read_all::<Store>))
+        .route("/data/{key}", web::put().to(replace::<Store>))
+        .route("/data/{key}", web::patch().to(update::<Store>));
 }
