@@ -2,14 +2,14 @@ use super::*;
 
 pub async fn create<DS: DataStore>(json: web::Json<Item>, store: web::Data<DS>) -> HttpResponse {
     match store.add(json.into_inner()).await {
-        Some(key) => HttpResponse::Created().body(serde_json::to_string(&key).unwrap()),
+        Some(key) => HttpResponse::Created().body(serde_json::to_string(&key).unwrap_or_default()),
         _ => HttpResponse::BadRequest().finish(),
     }
 }
 
 pub async fn delete<DS: DataStore>(path: web::Path<Key>, store: web::Data<DS>) -> HttpResponse {
-    let _ = store.delete(path.into_inner()).await;
-    HttpResponse::Ok().finish()
+    let delete_result = store.delete(path.into_inner()).await;
+    HttpResponse::Ok().body(serde_json::to_string(&delete_result).unwrap_or_default())
 }
 
 pub async fn read<DS: DataStore>(path: web::Path<Key>, store: web::Data<DS>) -> HttpResponse {
@@ -25,8 +25,8 @@ pub async fn replace<DS: DataStore>(
     path: web::Path<Key>,
     store: web::Data<DS>,
 ) -> HttpResponse {
-    let _ = store.replace(path.into_inner(), json.into_inner()).await;
-    HttpResponse::Ok().finish()
+    let replace_result = store.replace(path.into_inner(), json.into_inner()).await;
+    HttpResponse::Ok().body(serde_json::to_string(&replace_result).unwrap_or_default())
 }
 
 pub async fn update<DS: DataStore>(
@@ -34,6 +34,6 @@ pub async fn update<DS: DataStore>(
     path: web::Path<Key>,
     store: web::Data<DS>,
 ) -> HttpResponse {
-    let _ = store.update(path.into_inner(), json.into_inner()).await;
-    HttpResponse::Ok().finish()
+    let update_result = store.update(path.into_inner(), json.into_inner()).await;
+    HttpResponse::Ok().body(serde_json::to_string(&update_result).unwrap_or_default())
 }

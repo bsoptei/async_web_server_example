@@ -334,6 +334,7 @@ dependencies = [
  "actix-web",
  "async-trait",
  "futures",
+ "futures-util",
  "maplit",
  "rand",
  "serde",

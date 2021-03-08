@@ -1,5 +1,5 @@
 use actix_web::*;
-use awse::{handlers::*, *};
+use awse::*;
 
 const PORT: &str = "127.0.0.1:8000";
 
@@ -11,12 +11,7 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .app_data(store.clone())
-            .route("/data", web::post().to(create::<Store>))
-            .route("/data/{key}", web::delete().to(delete::<Store>))
-            .route("/data/{key}", web::get().to(read::<Store>))
-            .route("/data", web::get().to(read_all::<Store>))
-            .route("/data/{key}", web::put().to(replace::<Store>))
-            .route("/data/{key}", web::patch().to(update::<Store>))
+            .configure(configure_endpoints::<Store>)
     })
     .bind(PORT)?
     .run()

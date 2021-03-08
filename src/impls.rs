@@ -58,9 +58,9 @@ impl DataStore for InMemoryStore {
         }
     }
 
-    async fn delete(&self, key: Key) -> Option<String> {
+    async fn delete(&self, key: Key) -> Option<Key> {
         let mut store = self.store.lock().await;
-        store.remove(&key)
+        store.remove(&key).map(|_| key)
     }
 
     async fn get(&self, key: Key) -> String {
@@ -189,9 +189,8 @@ mod tests {
         let key_opt_none2 = block_on(test_store.replace(non_existing_key, item()));
         assert!(key_opt_none2.is_none());
 
-        let delete_result1: ItemWithKey =
-            serde_json::from_str(&block_on(test_store.delete(key)).unwrap()).unwrap();
-        assert_eq!(expected_item_with_key, delete_result1);
+        let delete_result1: Key = block_on(test_store.delete(key)).unwrap();
+        assert_eq!(key, delete_result1);
 
         let delete_result2 = block_on(test_store.delete(key));
         assert!(delete_result2.is_none());
