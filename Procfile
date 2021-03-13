@@ -1,1 +1,1 @@
- web: ./target/release/awse $PORT
+ web: ./target/release/awse
