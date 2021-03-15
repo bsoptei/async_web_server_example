@@ -159,4 +159,26 @@ mod tests {
             body_from_delete.unwrap()
         );
     }
+
+    #[test]
+    fn test_host_port() {
+        use std::env;
+
+        let custom_host = "1.1.1.1";
+        let custom_port = "5000";
+        env::set_var(HOST_VAR_NAME, custom_host);
+        env::set_var(PORT_VAR_NAME, custom_port);
+        let result = host_port();
+        assert_eq!(
+            format!("{}:{}", custom_host, custom_port),
+            result.to_string()
+        );
+        env::remove_var(HOST_VAR_NAME);
+        env::remove_var(PORT_VAR_NAME);
+        let result2 = host_port();
+        assert_eq!(
+            format!("{}:{}", DEFAULT_HOST, DEFAULT_PORT),
+            result2.to_string()
+        );
+    }
 }
